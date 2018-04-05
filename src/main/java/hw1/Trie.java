@@ -3,8 +3,9 @@ package hw1;
 public interface Trie {
     /**
      * Expected complexity: O(|element|)
+     *
      * @return <tt>true</tt> if this set did not already contain the specified
-     *         element
+     * element
      */
     boolean add(String element);
 
@@ -15,6 +16,7 @@ public interface Trie {
 
     /**
      * Expected complexity: O(|element|)
+     *
      * @return <tt>true</tt> if this set contained the specified element
      */
     boolean remove(String element);

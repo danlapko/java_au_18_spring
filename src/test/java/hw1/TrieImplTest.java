@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -24,83 +25,84 @@ public class TrieImplTest {
             int index = (int) (rnd.nextFloat() * SALTCHARS.length());
             salt.append(SALTCHARS.charAt(index));
         }
-        return prefix+salt.toString();
+        return prefix + salt.toString();
 
     }
 
-    private void makeTestTrie(){
+    private void makeTestTrie() {
 
         elements = new String[ELEMENTS_COUNT];
 
         elements[0] = "aa";
         trie.add(elements[0]);
 
-        for(int i=1; i<ELEMENTS_COUNT; i++){
-            elements[i] = genWithPrefix(elements[(i-1)/2],2);
+        for (int i = 1; i < ELEMENTS_COUNT; i++) {
+            elements[i] = genWithPrefix(elements[(i - 1) / 2], 2);
             trie.add(elements[i]);
         }
     }
 
     @Before
-    public void setUp(){
+    public void setUp() {
         trie = new TrieImpl();
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         trie = null;
         elements = null;
     }
 
-//  ----------- SIMPLE CASES ------------
+    //  ----------- SIMPLE CASES ------------
     @Test
-    public void add(){
+    public void add() {
         assertTrue(trie.add("abcd"));
     }
 
     @Test
-    public void contains(){
+    public void contains() {
         makeTestTrie();
 
-        for (String elem: elements) {
+        for (String elem : elements) {
             assertTrue(trie.contains(elem));
         }
-        for (String elem: elements) {
+        for (String elem : elements) {
             assertFalse(trie.contains(elem.substring(0, elem.length() - 1)));
         }
     }
 
     @Test
-    public void size(){
+    public void size() {
         makeTestTrie();
         assertEquals(ELEMENTS_COUNT, trie.size());
     }
 
     @Test
-    public void remove(){
+    public void remove() {
         makeTestTrie();
+
         assertTrue(trie.remove(elements[0]));
         assertFalse(trie.remove(elements[0]));
     }
 
     @Test
-    public void howManyStartsWithPrefix(){
+    public void howManyStartsWithPrefix() {
         makeTestTrie();
-        assertEquals(ELEMENTS_COUNT,trie.howManyStartsWithPrefix(elements[0]));
-        assertEquals(1,trie.howManyStartsWithPrefix(elements[ELEMENTS_COUNT-1]));
+        assertEquals(ELEMENTS_COUNT, trie.howManyStartsWithPrefix(elements[0]));
+        assertEquals(1, trie.howManyStartsWithPrefix(elements[ELEMENTS_COUNT - 1]));
     }
 
-//  ---------- COMPLEX CASES ----------
+    //  ---------- COMPLEX CASES ----------
     @Test
     public void add_contains_size_remove_size_contains() {
         // add
         makeTestTrie();
 
         // contains
-        for (String elem: elements) {
+        for (String elem : elements) {
             assertTrue(trie.contains(elem));
         }
-        for (String elem: elements) {
+        for (String elem : elements) {
             assertFalse(trie.contains(elem.substring(0, elem.length() - 1)));
         }
 
@@ -109,22 +111,26 @@ public class TrieImplTest {
 
 
         // remove
-        int remove_every = 3;
-        int n_leaved = 0;
-        for(int i=0; i<ELEMENTS_COUNT;i++)
-            if(i % remove_every == 0)
+        int removeEvery = 3;
+        int nLeaved = 0;
+        for (int i = 0; i < ELEMENTS_COUNT; i++) {
+            if (i % removeEvery == 0) {
                 trie.remove(elements[i]);
-            else
-                n_leaved += 1;
+            } else {
+                nLeaved += 1;
+            }
+        }
 
-        assertEquals(n_leaved, trie.size()); // size
+        assertEquals(nLeaved, trie.size()); // size
 
         //contains
-        for(int i=0; i<ELEMENTS_COUNT;i++)
-            if(i % remove_every == 0)
+        for (int i = 0; i < ELEMENTS_COUNT; i++) {
+            if (i % removeEvery == 0) {
                 assertFalse(trie.contains(elements[i]));
-            else
+            } else {
                 assertTrue(trie.contains(elements[i]));
+            }
+        }
     }
 
     @Test
@@ -132,61 +138,65 @@ public class TrieImplTest {
         // add
         String trunk = "abcdefg";
         String branchs = "ABCDEFG";
-        String elements[] = new String[trunk.length()+1];
+        String elements[] = new String[trunk.length() + 1];
         trie = new TrieImpl();
         trie.add(trunk);
         elements[0] = trunk;
 
-        for(int i=0; i< trunk.length(); i++) {
-            String tmp = trunk.substring(0, i+1) + branchs.charAt(i);
+        for (int i = 0; i < trunk.length(); i++) {
+            String tmp = trunk.substring(0, i + 1) + branchs.charAt(i);
             trie.add(tmp);
-            elements[i+1] = tmp;
+            elements[i + 1] = tmp;
         }
 
         // contains
-        for(String elem:elements)
+        for (String elem : elements) {
             assertTrue(trie.contains(elem));
+        }
 
         // size
-        assertEquals(trunk.length()+1, trie.size());
+        assertEquals(trunk.length() + 1, trie.size());
 
         //prefix
-        int how_many_in_trie;
-        int true_value;
-        for(int i=0; i<trunk.length(); i++) {
-            how_many_in_trie = trie.howManyStartsWithPrefix(trunk.substring(0,i+1));
-            true_value = trunk.length()-i+1;
-            assertEquals(true_value,how_many_in_trie);
+        int howManyInTrie;
+        int trueValue;
+        for (int i = 0; i < trunk.length(); i++) {
+            howManyInTrie = trie.howManyStartsWithPrefix(trunk.substring(0, i + 1));
+            trueValue = trunk.length() - i + 1;
+            assertEquals(trueValue, howManyInTrie);
         }
-        for(int i=1; i<trunk.length(); i++) {
-            how_many_in_trie = trie.howManyStartsWithPrefix(elements[i]);
-            assertEquals(1,how_many_in_trie);
+        for (int i = 1; i < trunk.length(); i++) {
+            howManyInTrie = trie.howManyStartsWithPrefix(elements[i]);
+            assertEquals(1, howManyInTrie);
         }
 
         // remove
-        int remove_every = 2;
-        int n_leaved = 0;
-        for(int i=0; i<elements.length;i++)
-            if(i % remove_every == 0)
+        int removeEvery = 2;
+        int nLeaved = 0;
+        for (int i = 0; i < elements.length; i++) {
+            if (i % removeEvery == 0) {
                 trie.remove(elements[i]);
-            else
-                n_leaved += 1;
+            } else {
+                nLeaved += 1;
+            }
+        }
 
         // size
-        assertEquals(n_leaved, trie.size());
+        assertEquals(nLeaved, trie.size());
 
         // prefix
-        for(int i=0; i<trunk.length(); i++) {
-            how_many_in_trie = trie.howManyStartsWithPrefix(trunk.substring(0,i+1));
-            true_value = n_leaved-(i-i/remove_every);
-            assertEquals(true_value,how_many_in_trie);
+        for (int i = 0; i < trunk.length(); i++) {
+            howManyInTrie = trie.howManyStartsWithPrefix(trunk.substring(0, i + 1));
+            trueValue = nLeaved - (i - i / removeEvery);
+            assertEquals(trueValue, howManyInTrie);
         }
-        for(int i=1; i<trunk.length(); i++) {
-            how_many_in_trie = trie.howManyStartsWithPrefix(elements[i]);
-            if(i%remove_every == 0)
-                assertEquals(0,how_many_in_trie);
-            else
-                assertEquals(1,how_many_in_trie);
+        for (int i = 1; i < trunk.length(); i++) {
+            howManyInTrie = trie.howManyStartsWithPrefix(elements[i]);
+            if (i % removeEvery == 0) {
+                assertEquals(0, howManyInTrie);
+            } else {
+                assertEquals(1, howManyInTrie);
+            }
         }
     }
 
@@ -195,10 +205,10 @@ public class TrieImplTest {
         trie = new TrieImpl();
         trie.add("ab");
         trie.add("bc");
-        assertEquals(1,trie.howManyStartsWithPrefix("a"));
-        assertEquals(1,trie.howManyStartsWithPrefix("ab"));
-        assertEquals(1,trie.howManyStartsWithPrefix("b"));
-        assertEquals(1,trie.howManyStartsWithPrefix("bc"));
+        assertEquals(1, trie.howManyStartsWithPrefix("a"));
+        assertEquals(1, trie.howManyStartsWithPrefix("ab"));
+        assertEquals(1, trie.howManyStartsWithPrefix("b"));
+        assertEquals(1, trie.howManyStartsWithPrefix("bc"));
     }
 
     @Test
@@ -207,7 +217,7 @@ public class TrieImplTest {
         trie.add("abcefg");
         trie.add("abc");
         trie.remove("abcefg");
-        assertEquals(1,trie.size());
+        assertEquals(1, trie.size());
         assertTrue(trie.contains("abc"));
         assertFalse(trie.contains("abcefg"));
     }
@@ -219,7 +229,7 @@ public class TrieImplTest {
         trie.add("abde");
         trie.add("abde");
 
-        assertEquals(2,trie.size());
+        assertEquals(2, trie.size());
         assertEquals(2, trie.howManyStartsWithPrefix("ab"));
         assertEquals(1, trie.howManyStartsWithPrefix("abc"));
         assertEquals(1, trie.howManyStartsWithPrefix("abd"));
@@ -230,11 +240,11 @@ public class TrieImplTest {
         trie = new TrieImpl();
         trie.add("abc");
         trie.add("abde");
-
+        assertTrue(trie.contains("abc"));
         assertTrue(trie.remove("abc"));
         assertFalse(trie.remove("abc"));
-        assertEquals(1,trie.size());
-        assertEquals(0,trie.howManyStartsWithPrefix("abc"));
-        assertEquals(1,trie.howManyStartsWithPrefix("ab"));
+        assertEquals(1, trie.size());
+        assertEquals(0, trie.howManyStartsWithPrefix("abc"));
+        assertEquals(1, trie.howManyStartsWithPrefix("ab"));
     }
 }
