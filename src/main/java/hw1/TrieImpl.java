@@ -1,19 +1,16 @@
 package hw1;
 
+import com.sun.istack.internal.Nullable;
+
 import java.util.HashMap;
 
-class Node{
-    HashMap<Character, Node> children;
-    Node parent;
-    boolean is_terminal;
-    int number_of_sub_terminals;
-    {
-        children = new HashMap<>();
-        is_terminal = false;
-        number_of_sub_terminals = 0;
-    }
+class Node {
+    final HashMap<Character, Node> children = new HashMap<>();
+    final Node parent;
+    boolean isTerminal = false;
+    int numberOfSubTerminals = 0;
 
-    Node(Node parent){
+    Node(Node parent) {
         this.parent = parent;
     }
 }
@@ -22,37 +19,37 @@ public class TrieImpl implements Trie {
     final private Node root;
 
 
-    TrieImpl(){
+    TrieImpl() {
         root = new Node(null);
     }
 
     /**
      * Expected complexity: O(|element|)
+     *
      * @return <tt>true</tt> if this set did not already contain the specified
-     *         element
+     * element
      */
     @Override
-    public boolean add(String element) {
-        if(contains(element))
+    public boolean add(@Nullable String element) {
+        if (element == null || contains(element)) {
             return false;
+        }
 
         Node node = root;
-        root.number_of_sub_terminals += 1;
+        root.numberOfSubTerminals++;
 
-        for(int i=0; i<element.length(); i++){
+        for (int i = 0; i < element.length(); i++) {
             char ch = element.charAt(i);
-            Node next_node = node.children.get(ch);
-            if(next_node == null) {
-                next_node = new Node(node);
-                node.children.put(ch, next_node);
+            Node nextNode = node.children.get(ch);
+            if (nextNode == null) {
+                nextNode = new Node(node);
+                node.children.put(ch, nextNode);
             }
-            next_node.number_of_sub_terminals += 1;
-            node = next_node;
+            nextNode.numberOfSubTerminals++;
+            node = nextNode;
         }
-        if(!node.is_terminal) {
-            node.is_terminal = true;
 
-        }
+        node.isTerminal = true;
 
         return true;
     }
@@ -61,47 +58,53 @@ public class TrieImpl implements Trie {
      * Expected complexity: O(|element|)
      */
     @Override
-    public boolean contains(String element) {
+    public boolean contains(@Nullable String element) {
+        if (element == null) {
+            return false;
+        }
+
         Node node = root;
 
-        for(int i=0; i<element.length(); i++){
+        for (int i = 0; i < element.length(); i++) {
             char ch = element.charAt(i);
 
-            Node next_node = node.children.get(ch);
-            if(next_node == null)
+            Node nextNode = node.children.get(ch);
+            if (nextNode == null) {
                 return false;
+            }
 
-            node = next_node;
+            node = nextNode;
         }
-        return node.is_terminal;
+        return node.isTerminal;
     }
 
     /**
      * Expected complexity: O(|element|)
+     *
      * @return <tt>true</tt> if this set contained the specified element
      */
     @Override
-    public boolean remove(String element) {
-        if (!contains(element))
+    public boolean remove(@Nullable String element) {
+        if (element == null || !contains(element)) {
             return false;
-
-        Node node = root;
-        root.number_of_sub_terminals -= 1;
-
-        for(int i=0; i<element.length(); i++){
-            char ch = element.charAt(i);
-            node = node.children.get(ch);
-            node.number_of_sub_terminals -= 1;
         }
 
-        assert node.is_terminal;
-        node.is_terminal = false;
+        Node node = root;
+        root.numberOfSubTerminals--;
 
-        int i_char = element.length() - 1;
-        while (node.number_of_sub_terminals==0 && i_char >= 0){
+        for (int i = 0; i < element.length(); i++) {
+            char ch = element.charAt(i);
+            node = node.children.get(ch);
+            node.numberOfSubTerminals--;
+        }
+
+        assert node.isTerminal;
+        node.isTerminal = false;
+
+
+        for (int iChar = element.length() - 1; node.numberOfSubTerminals == 0 && iChar >= 0; iChar--) {
             node = node.parent;
-            node.children.remove(element.charAt(i_char));
-            i_char -= 1;
+            node.children.remove(element.charAt(iChar));
         }
 
         return true;
@@ -112,22 +115,26 @@ public class TrieImpl implements Trie {
      */
     @Override
     public int size() {
-        return root.number_of_sub_terminals;
+        return root.numberOfSubTerminals;
     }
 
     /**
      * Expected complexity: O(|prefix|)
      */
     @Override
-    public int howManyStartsWithPrefix(String prefix) {
+    public int howManyStartsWithPrefix(@Nullable String prefix) {
+        if (prefix == null) {
+            return 0;
+        }
         Node node = root;
-        for(int i=0; i<prefix.length(); i++){
+        for (int i = 0; i < prefix.length(); i++) {
             char ch = prefix.charAt(i);
             node = node.children.get(ch);
-            if (node==null)
+            if (node == null) {
                 return 0;
+            }
         }
 
-        return node.number_of_sub_terminals;
+        return node.numberOfSubTerminals;
     }
 }

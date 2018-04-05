@@ -1,6 +1,6 @@
 package hw2;
 
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 import org.junit.Test;
 
 import java.util.HashMap;
